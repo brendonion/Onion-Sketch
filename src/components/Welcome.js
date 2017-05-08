@@ -1,0 +1,21 @@
+import React, { Component } from 'react'
+import RaisedButton from 'material-ui/RaisedButton';
+import { Link } from 'react-router-dom';
+
+class Welcome extends Component {
+  render () {
+    return (
+      <div className='welcome-page'>
+        <h1>Welcome to Onion Sketch</h1>
+        <img className='home-logo' />
+        <p>An app in progress...</p>
+        <p>Please Login or Register</p>
+        <Link to='/login'><RaisedButton label='Login'/></Link>
+        <span><i className="material-icons">subdirectory_arrow_left</i> <i className="material-icons">subdirectory_arrow_right</i></span>
+        <Link to='/register'><RaisedButton label='Register'/></Link>
+      </div>
+    )
+  }
+}
+
+export default Welcome;
