@@ -48,7 +48,7 @@ class Register extends Component {
           <RaisedButton 
             type='submit'
             label='Submit'
-            primary={true}
+            secondary={true}
           />
           {
             this.state.registerError &&

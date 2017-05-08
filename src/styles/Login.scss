@@ -1,0 +1,90 @@
+$paper: #c9f2ff;
+$dark-paper: #94c2d1;
+
+.welcome-page {
+  text-align: center;
+  background: $paper;
+  padding: 20px;
+  padding-bottom: 40px;
+  margin: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 4px -4px gray;
+}
+
+.welcome-page:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-width: 0 16px 16px 0;
+  border-style: solid;
+  border-color: $dark-paper white;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+}
+
+.facebook-button {
+  padding: 10px;
+  padding-top: 7px;
+  background: #3B5998;
+  border-radius: 3px;
+  border: 0;
+  color: white;
+  height: 36px;
+  &:hover {
+    cursor: pointer;
+    background: #324b81;
+  }
+}
+
+.fa-facebook-square {
+  font-size: 15px;
+}
+
+.login-form {
+  text-align: center;
+  background: $paper;
+  padding: 20px;
+  padding-bottom: 40px;
+  margin: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 4px -4px gray;
+}
+
+.login-form:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-width: 0 16px 16px 0;
+  border-style: solid;
+  border-color: $dark-paper white;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+}
+
+.register-form {
+  text-align: center;
+  background: $paper;
+  padding: 20px;
+  padding-bottom: 40px;
+  margin: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 4px -4px gray;
+}
+
+.register-form:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-width: 0 16px 16px 0;
+  border-style: solid;
+  border-color: $dark-paper white;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+}
+
+.fa-pencil-square.pencil-logo {
+  font-size: 40px;
+}

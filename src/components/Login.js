@@ -3,6 +3,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
+import '../styles/Login.scss';
 import { login, resetPassword, loginWithFacebook } from '../helpers/auth'
 
 function setErrorMsg(error) {
@@ -56,7 +57,7 @@ class Login extends Component {
           <RaisedButton 
             type='submit'
             label='Submit'
-            primary={true}
+            secondary={true}
           />
           {
             this.state.loginMessage &&

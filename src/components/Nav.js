@@ -15,12 +15,11 @@ class Nav extends Component {
 
   render () {
     return (
-      <AppBar title='Onion Sketch' iconElementRight={this.props.authed
+      <AppBar style={{background: '#d30236'}} title='Onion Sketch' iconElementRight={this.props.authed
           ? 
           <span>
             <span className='user-email'>{this.props.user.email}</span>
             <Link to='/home' className='home-button'><RaisedButton><i className="material-icons nav-icons">home</i></RaisedButton></Link>
-            <Link to='/calendar' className='calendar-button'><RaisedButton><i className="material-icons nav-icons">event_note</i></RaisedButton></Link>
             <FlatButton
               label='Logout'
               primary={false}
@@ -34,7 +33,7 @@ class Nav extends Component {
             <Link to='/register'><FlatButton label='Register'/></Link>
             <Redirect to='/' />
           </span>
-          } iconElementLeft={<span><i class="fa fa-pencil-square" aria-hidden="true"></i></span>}
+          } iconElementLeft={<span><i className="fa fa-pencil-square" aria-hidden="true"></i></span>}
           iconStyleRight={{margin: '10px'}} iconStyleLeft={{marginTop: '20px'}}>
       </AppBar>
     );

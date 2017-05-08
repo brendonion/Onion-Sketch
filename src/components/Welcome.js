@@ -7,6 +7,8 @@ class Welcome extends Component {
     return (
       <div className='welcome-page'>
         <h1>Welcome to Onion Sketch</h1>
+        <i className="fa fa-pencil-square pencil-logo" aria-hidden="true"></i>
+        <p>By Brendan Walker</p>
         <img className='home-logo' />
         <p>An app in progress...</p>
         <p>Please Login or Register</p>
