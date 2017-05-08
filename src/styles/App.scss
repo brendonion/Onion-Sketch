@@ -1,40 +1,5 @@
-.facebook-button {
-  padding: 10px;
-  padding-top: 7px;
-  background: #3B5998;
-  border-radius: 3px;
-  border: 0;
-  color: white;
-  height: 36px;
-  &:hover {
-    cursor: pointer;
-    background: #324b81;
-  }
-}
-
-.fa-facebook-square {
-  font-size: 15px;
-}
-
-.login-form {
-  text-align: center;
-  border: 1px solid #f4f5f7;
-  padding: 20px;
-  padding-bottom: 40px;
-  margin: 20px;
-  box-shadow: 5px 5px 5px #888888;
-  border-radius: 4px;
-}
-
-.register-form {
-  text-align: center;
-  border: 1px solid #f4f5f7;
-  padding: 20px;
-  padding-bottom: 40px;
-  margin: 20px;
-  box-shadow: 5px 5px 5px #888888;
-  border-radius: 4px;
-}
+@import 'Login';
+@import 'Nav';
 
 i.material-icons.nav-icons {
   margin-top: 5px;
@@ -50,14 +15,4 @@ i.material-icons.logo-icon {
 
 .user-email {
   margin-right: 18px;
-}
-
-.welcome-page {
-  text-align: center;
-  border: 1px solid #f4f5f7;
-  padding: 20px;
-  padding-bottom: 45px;
-  margin: 20px;
-  box-shadow: 5px 5px 5px #888888;
-  border-radius: 4px;
 }
