@@ -10,6 +10,7 @@ import Welcome from './components/Welcome';
 import Login from './components/Login';
 import Register from './components/Register';
 import Home from './components/Home';
+import DrawArea from './components/DrawArea';
 import { logout } from './helpers/auth.js';
 import { firebaseAuth } from './services/Firebase';
 
@@ -62,6 +63,7 @@ class App extends Component {
                   <Route authed={this.state.authed} path='/login' component={Login} />
                   <Route authed={this.state.authed} path='/register' component={Register} />
                   <Route authed={this.state.authed} path='/home' component={Home} />
+                  <Route authed={this.state.authed} path='/canvas' component={DrawArea} />
                   <Route render={() => <h3>No Match</h3>} />
                 </Switch>
               </div>
