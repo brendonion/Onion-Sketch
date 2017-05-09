@@ -19,7 +19,8 @@ class Nav extends Component {
           ? 
           <span>
             <span className='user-email'>{this.props.user.email}</span>
-            <Link to='/home' className='home-button'><RaisedButton><i className="material-icons nav-icons">home</i></RaisedButton></Link>
+            <Link to='/home' className='home-button'><RaisedButton><i className="fa fa-home" aria-hidden="true"></i></RaisedButton></Link>
+            <Link to='/canvas' className='canvas-button'><RaisedButton><i className="fa fa-pencil-square-o" aria-hidden="true"></i></RaisedButton></Link>
             <FlatButton
               label='Logout'
               primary={false}
@@ -33,7 +34,8 @@ class Nav extends Component {
             <Link to='/register'><FlatButton label='Register'/></Link>
             <Redirect to='/' />
           </span>
-          } iconElementLeft={<span><i className="fa fa-pencil-square" aria-hidden="true"></i></span>}
+          } iconElementLeft={this.props.authed ? <span><Link to='/home'><i className="fa fa-pencil-square" aria-hidden="true"></i></Link></span> : 
+          <span><i className="fa fa-pencil-square" aria-hidden="true"></i></span>}
           iconStyleRight={{margin: '10px'}} iconStyleLeft={{marginTop: '20px'}}>
       </AppBar>
     );
