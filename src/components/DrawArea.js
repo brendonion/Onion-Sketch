@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import Immutable from "immutable";
+import { SketchPicker } from 'react-color';
 
+import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 
 
 class DrawArea extends React.Component {
@@ -10,12 +13,41 @@ class DrawArea extends React.Component {
     this.state = {
       isDrawing: false,
       lines: new Immutable.List(),
+      colorOpen: false,
+      clearAllOpen: false,
+      strokeColor: 'black'
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.clearAll = this.clearAll.bind(this);
+    this.handleColorClick = this.handleColorClick.bind(this);
+    this.handleClearAllOpen = this.handleClearAllOpen.bind(this);
+    this.handleClearAllClose = this.handleClearAllClose.bind(this);
+    this.changeLineColor = this.changeLineColor.bind(this);
+  }
+
+  changeLineColor(color, event) {
+    const path = document.getElementsByClassName('path');
+    let colorString = `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a})`;
+    this.setState({strokeColor: colorString});
+    try {
+      path[path.length].style.stroke = this.state.strokeColor;
+    } catch(e) {
+    }
+  }
+
+  handleColorClick() {
+    this.setState({colorOpen: !this.state.colorOpen});
+  }
+
+  handleClearAllOpen() {
+    this.setState({clearAllOpen: true});
+  }
+
+  handleClearAllClose() {
+    this.setState({clearAllOpen: false});
   }
 
   handleMouseDown(mouseEvent) {
@@ -48,6 +80,10 @@ class DrawArea extends React.Component {
 
     const point = this.relativeCoordinatesForEvent(mouseEvent);
 
+    const path = document.getElementsByClassName('path');
+
+    path[path.length - 1].style.stroke = this.state.strokeColor;
+
     this.setState(prevState => {
       return {
         lines: prevState.lines.updateIn([prevState.lines.size - 1], line => line.push(point)),
@@ -55,38 +91,70 @@ class DrawArea extends React.Component {
     });
   }
 
-  clearAll() {
-    this.setState({lines: new Immutable.List()});
-  }
-
-  componentDidMount() {
-    document.addEventListener("mouseup", this.handleMouseUp);
-  }
-  
-  componentWillUnmount() {
-    document.removeEventListener("mouseup", this.handleMouseUp);
-  }
-
   handleMouseUp() {
     this.setState({ isDrawing: false });
   }
 
+  clearAll() {
+    this.setState({lines: new Immutable.List(), clearAllOpen: false});
+  }
+
+  componentDidMount() {
+    document.addEventListener('mouseup', this.handleMouseUp);
+  }
+  
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleMouseUp);
+  }
+
+
   render() {
+    
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary={false}
+        onTouchTap={this.handleClearAllClose}
+      />,
+      <FlatButton
+        label="Clear All"
+        primary={true}
+        onTouchTap={this.clearAll}
+      />,
+    ];
+
     return (
       <div>
-        <div className='drawArea' ref="drawArea" onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
-          <Drawing lines={this.state.lines} />
+        {
+          this.state.colorOpen 
+          ? 
+            <div className='color-picker'>
+              <div className='cover' onClick={this.handleColorClick}/>
+              <SketchPicker color={this.state.strokeColor} onChangeComplete={this.changeLineColor} />
+            </div>
+          : 
+            null
+        }
+        <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
+          <Drawing style={{stroke: 'red'}} lines={this.state.lines} />
         </div>
         <span className='button-container'>
-          <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.clearAll}/>
-          <RaisedButton className='draw-options' primary={true} label='Change Color' />
+          <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.handleClearAllOpen}/>
+          <RaisedButton className='draw-options' primary={true} label='Change Color' onTouchTap={this.handleColorClick} />
           <RaisedButton className='draw-options' primary={true} label='Change Size' />
           <RaisedButton className='draw-options' primary={true} label='Erase' />
         </span>
+        <Dialog
+          title='Are you sure you want to clear all?'
+          actions={actions}
+          modal={true}
+          open={this.state.clearAllOpen}
+        />
       </div>
     );
   }
 }
+
 
 function Drawing({ lines }) {
   return (
@@ -99,9 +167,9 @@ function Drawing({ lines }) {
 }
 
 function DrawingLine({ line }) {
-  const pathData = "M " + line
+  const pathData = 'M ' + line
     .map(p => p.get('x') + ' ' + p.get('y'))
-    .join(" L ");
+    .join(' L ');
 
   return <path className='path' d={pathData} />;
 }
