@@ -1,6 +1,12 @@
 $paper: #c9f2ff;
 $dark-paper: #94c2d1;
 
+.start-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .drawing-container {
   background: $paper;
   padding: 20px;
@@ -28,7 +34,7 @@ $dark-paper: #94c2d1;
   border-radius: 4px;
   cursor: url('../../public/images/circle-pointer.png') 5 5, crosshair;
   margin: auto;
-  margin-top: 5%;
+  margin-top: 1.5%;
 }
 
 .path {

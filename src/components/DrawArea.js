@@ -5,6 +5,8 @@ import { SketchPicker } from 'react-color';
 import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 
+import ShapeTimer from './ShapeTimer'
+
 
 class DrawArea extends React.Component {
   constructor() {
@@ -16,7 +18,8 @@ class DrawArea extends React.Component {
       clearAllOpen: false,
       sliderOpen: false,
       strokeColor: 'black',
-      slider: 5
+      slider: 5,
+      start: false
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -31,6 +34,7 @@ class DrawArea extends React.Component {
     this.handleSliderOpen = this.handleSliderOpen.bind(this);
     this.handleSliderClose = this.handleSliderClose.bind(this);
     this.handleEraser = this.handleEraser.bind(this);
+    this.handleStart = this.handleStart.bind(this);
   }
 
   changeLineColor(color, event) {
@@ -39,8 +43,11 @@ class DrawArea extends React.Component {
     this.setState({strokeColor: colorString});
     try {
       path[path.length].style.stroke = this.state.strokeColor;
-    } catch(e) {
-    }
+    } catch(e) {}
+  }
+
+  handleStart() {
+    this.setState({start: true});
   }
 
   handleEraser() {
@@ -78,7 +85,7 @@ class DrawArea extends React.Component {
     this.setState(prevState => {
       return {
         lines: prevState.lines.push(new Immutable.List([point])),
-        isDrawing: true,
+        isDrawing: true
       };
     });
   }
@@ -107,10 +114,8 @@ class DrawArea extends React.Component {
     const path = document.getElementsByClassName('path');
     try {
       path[path.length].style.strokeWidth = `${this.state.slider}px`;
-    } catch(e) {
-
-    }
-  };
+    } catch(e) {}
+  }
 
   relativeCoordinatesForEvent(mouseEvent) {
     const boundingRect = this.refs.drawArea.getBoundingClientRect();
@@ -150,56 +155,71 @@ class DrawArea extends React.Component {
     return (
       <div className='drawing-container'>
         {
-          this.state.colorOpen 
-          ? 
-            <div className='color-picker'>
-              <div className='cover' onClick={this.handleColorClick}/>
-              <SketchPicker color={this.state.strokeColor} onChangeComplete={this.changeLineColor} />
-            </div>
-          : 
-            null
-        }
-        <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
-          <Drawing lines={this.state.lines} />
-        </div>
-        <span className='button-container'>
-          <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.handleClearAllOpen}/>
-          <RaisedButton className='draw-options' primary={true} label='Change Color' onTouchTap={this.handleColorClick} />
-          <RaisedButton className='draw-options' primary={true} label='Change Size' onTouchTap={this.handleSliderOpen} />
-          <RaisedButton className='draw-options' primary={true} label='Erase' onTouchTap={this.handleEraser} />
-        </span>
-        <Popover
-          open={this.state.sliderOpen}
-          anchorEl={this.state.anchorEl}
-          anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
-          targetOrigin={{horizontal: 'middle', vertical: 'top'}}
-          onRequestClose={this.handleSliderClose}
-          animation={PopoverAnimationVertical}
-        >
-          <Menu>
-            <MenuItem primaryText='Adjust Stroke Size'>
-              <Slider
-                min={1}
-                max={50}
-                step={1}
-                value={this.state.slider}
-                onChange={this.handleSlider}
-              />
-              <p>{this.state.slider}px</p>
-            </MenuItem>
-          </Menu>
-        </Popover>
-        <div className='stroke-info'>
-          <span className='stroke-container'>
-            <i style={{color: this.state.strokeColor, fontSize: `${this.state.slider}px`}} className="fa fa-circle" aria-hidden="true"></i>
+        !this.state.start ? 
+          <span className='start-container'>
+            <RaisedButton secondary={true} label='START' onTouchTap={this.handleStart} />
+          </span> 
+        : 
+        <div>
+          <ShapeTimer />
+          <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
+            <Drawing lines={this.state.lines} />
+          </div>
+          <span className='button-container'>
+            <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.handleClearAllOpen}/>
+            <RaisedButton className='draw-options' primary={true} label='Change Color' onTouchTap={this.handleColorClick} />
+            <RaisedButton className='draw-options' primary={true} label='Change Size' onTouchTap={this.handleSliderOpen} />
+            <RaisedButton className='draw-options' primary={true} label='Erase' onTouchTap={this.handleEraser} />
           </span>
+          <Popover
+            open={this.state.colorOpen}
+            anchorEl={this.state.anchorEl}
+            anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'middle', vertical: 'top'}}
+            onRequestClose={this.handleColorClick}
+            animation={PopoverAnimationVertical}
+          >
+            <Menu>
+              <MenuItem primaryText='Adjust Stroke Color'>
+                <SketchPicker color={this.state.strokeColor} onChangeComplete={this.changeLineColor} />
+                <p>{this.state.strokeColor}</p>
+              </MenuItem>
+            </Menu>
+          </Popover>
+          <Popover
+            open={this.state.sliderOpen}
+            anchorEl={this.state.anchorEl}
+            anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'middle', vertical: 'top'}}
+            onRequestClose={this.handleSliderClose}
+            animation={PopoverAnimationVertical}
+          >
+            <Menu>
+              <MenuItem primaryText='Adjust Stroke Size'>
+                <Slider
+                  min={1}
+                  max={50}
+                  step={1}
+                  value={this.state.slider}
+                  onChange={this.handleSlider}
+                />
+                <p>{this.state.slider}px</p>
+              </MenuItem>
+            </Menu>
+          </Popover>
+          <div className='stroke-info'>
+            <span className='stroke-container'>
+              <i style={{color: this.state.strokeColor, fontSize: `${this.state.slider}px`}} className="fa fa-circle" aria-hidden="true"></i>
+            </span>
+          </div>
+          <Dialog
+            title='Are you sure you want to clear it all?'
+            actions={actions}
+            modal={true}
+            open={this.state.clearAllOpen}
+          />
         </div>
-        <Dialog
-          title='Are you sure you want to clear it all?'
-          actions={actions}
-          modal={true}
-          open={this.state.clearAllOpen}
-        />
+        }
       </div>
     );
   }

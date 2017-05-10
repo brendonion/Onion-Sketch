@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "body-parser": "^1.17.1",
+    "bootstrap": "^3.3.7",
     "express": "^4.15.2",
     "firebase": "^3.9.0",
     "http-proxy": "^1.16.2",
@@ -14,6 +15,7 @@
     "react": "^15.5.4",
     "react-color": "^2.11.7",
     "react-dom": "^15.5.4",
+    "react-progressbar.js": "^0.2.0",
     "react-redux": "^5.0.4",
     "react-router-dom": "^4.1.1",
     "react-tap-event-plugin": "^2.0.1",
