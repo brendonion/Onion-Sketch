@@ -12,6 +12,7 @@ import Register from './components/Register';
 import Home from './components/Home';
 import DrawArea from './components/DrawArea';
 import DrawGame from './components/DrawGame';
+import GameOver from './components/GameOver';
 import { logout } from './helpers/auth.js';
 import { firebaseAuth } from './services/Firebase';
 
@@ -66,6 +67,7 @@ class App extends Component {
                   <Route authed={this.state.authed} path='/home' component={Home} />
                   <Route authed={this.state.authed} path='/canvas' component={DrawArea} />
                   <Route authed={this.state.authed} path='/game' component={DrawGame} />
+                  <Route authed={this.state.authed} path='/gameover' component={GameOver} />
                   <Route render={() => <h3>No Match</h3>} />
                 </Switch>
               </div>
