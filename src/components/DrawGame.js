@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { SketchPicker } from 'react-color';
-import { Redirect } from 'react-router-dom';
 
 import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 
-import ShapeTimer from './ShapeTimer'
+import GameTimer from './GameTimer'
 
 
-class DrawArea extends React.Component {
+class DrawGame extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -21,7 +20,7 @@ class DrawArea extends React.Component {
       strokeColor: 'black',
       slider: 5,
       start: false,
-      prepped: false
+      finished: false
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -37,10 +36,10 @@ class DrawArea extends React.Component {
     this.handleSliderClose = this.handleSliderClose.bind(this);
     this.handleEraser = this.handleEraser.bind(this);
     this.handleStart = this.handleStart.bind(this);
-    this.handleShapeFinish = this.handleShapeFinish.bind(this);
+    this.handleGameFinish = this.handleGameFinish.bind(this);
   }
 
-  handleShapeFinish() {
+  handleGameFinish() {
     this.setState({prepped: true});
   }
 
@@ -123,7 +122,7 @@ class DrawArea extends React.Component {
       path[path.length].style.stroke = this.state.strokeColor;
     } catch(e) {}
   }
-  
+
   relativeCoordinatesForEvent(mouseEvent) {
     const boundingRect = this.refs.drawArea.getBoundingClientRect();
     return new Immutable.Map({
@@ -165,11 +164,11 @@ class DrawArea extends React.Component {
         !this.state.start 
         ? 
           <span className='start-container'>
-            <RaisedButton secondary={true} label='START' onTouchTap={this.handleStart} />
-          </span> 
+            <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
+          </span>
         : 
         <div>
-          <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
+          <GameTimer />
           <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
             <Drawing lines={this.state.lines} />
           </div>
@@ -228,7 +227,6 @@ class DrawArea extends React.Component {
           />
         </div>
         }
-        {this.state.prepped ? <Redirect to='/game' /> : null}
       </div>
     );
   }
@@ -253,4 +251,4 @@ function DrawingLine({ line }) {
   return <path className='path' d={pathData} />;
 }
 
-export default DrawArea;
+export default DrawGame;

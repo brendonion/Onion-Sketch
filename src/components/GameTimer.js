@@ -2,20 +2,16 @@ import React, {Component} from 'react';
 const ProgressBar = require('react-progressbar.js');
 const Circle = ProgressBar.Circle;
 
-class ShapeTimer extends Component {
+class GameTimer extends Component {
   constructor(props){
     super(props);
-    this.state = {currentCount: 5}
+    this.state = {currentCount: 30}
   }
-
 
   timer() {
     this.setState({
       currentCount: this.state.currentCount - 1
     });
-    if (this.state.currentCount <= 0) {
-      return this.props.handleShapeFinish();
-    }
   }
 
   componentDidMount() {
@@ -28,7 +24,7 @@ class ShapeTimer extends Component {
   render() {
 
     const options = {
-      duration: 5000,
+      duration: 30000,
       easing: 'easeOut',
       strokeWidth: 4,
       color: '#d30236',
@@ -58,4 +54,4 @@ class ShapeTimer extends Component {
   }
 }
 
-export default ShapeTimer;
+export default GameTimer;
