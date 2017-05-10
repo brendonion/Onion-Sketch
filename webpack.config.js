@@ -67,12 +67,12 @@ const config = {
     {
       test: /\.(jpe?g|png|gif|svg)$/i,
       loaders: [
-          'file?name=[name].[ext]',
+          'file-loader?name=[name].[ext]',
       ]
     },
     {
       test: /\.(otf|eot|svg|ttf|woff|woff2)$/i,
-      loader: 'file?name=./public/assets/fonts/[name].[ext]',
+      loader: 'file-loader?name=./public/assets/fonts/[name].[ext]',
       query: {
         limit: 10000
       }

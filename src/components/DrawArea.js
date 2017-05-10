@@ -30,6 +30,7 @@ class DrawArea extends React.Component {
     this.handleSlider = this.handleSlider.bind(this);
     this.handleSliderOpen = this.handleSliderOpen.bind(this);
     this.handleSliderClose = this.handleSliderClose.bind(this);
+    this.handleEraser = this.handleEraser.bind(this);
   }
 
   changeLineColor(color, event) {
@@ -40,6 +41,10 @@ class DrawArea extends React.Component {
       path[path.length].style.stroke = this.state.strokeColor;
     } catch(e) {
     }
+  }
+
+  handleEraser() {
+    this.setState({strokeColor: 'white'});
   }
 
   handleSliderOpen(event) {
@@ -69,22 +74,12 @@ class DrawArea extends React.Component {
     if (mouseEvent.button != 0) {
       return;
     }
-
     const point = this.relativeCoordinatesForEvent(mouseEvent);
-
     this.setState(prevState => {
       return {
         lines: prevState.lines.push(new Immutable.List([point])),
         isDrawing: true,
       };
-    });
-  }
-
-  relativeCoordinatesForEvent(mouseEvent) {
-    const boundingRect = this.refs.drawArea.getBoundingClientRect();
-    return new Immutable.Map({
-      x: mouseEvent.clientX - boundingRect.left,
-      y: mouseEvent.clientY - boundingRect.top,
     });
   }
 
@@ -104,11 +99,7 @@ class DrawArea extends React.Component {
   }
 
   handleMouseUp() {
-    this.setState({ isDrawing: false });
-  }
-
-  clearAll() {
-    this.setState({lines: new Immutable.List(), clearAllOpen: false});
+    this.setState({isDrawing: false});
   }
 
   handleSlider(event, value) {
@@ -121,6 +112,18 @@ class DrawArea extends React.Component {
     }
   };
 
+  relativeCoordinatesForEvent(mouseEvent) {
+    const boundingRect = this.refs.drawArea.getBoundingClientRect();
+    return new Immutable.Map({
+      x: mouseEvent.clientX - boundingRect.left,
+      y: mouseEvent.clientY - boundingRect.top,
+    });
+  }
+
+  clearAll() {
+    this.setState({lines: new Immutable.List(), clearAllOpen: false});
+  }
+
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
   }
@@ -128,7 +131,6 @@ class DrawArea extends React.Component {
   componentWillUnmount() {
     document.removeEventListener('mouseup', this.handleMouseUp);
   }
-
 
   render() {
     
@@ -146,7 +148,7 @@ class DrawArea extends React.Component {
     ];
 
     return (
-      <div>
+      <div className='drawing-container'>
         {
           this.state.colorOpen 
           ? 
@@ -164,7 +166,7 @@ class DrawArea extends React.Component {
           <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.handleClearAllOpen}/>
           <RaisedButton className='draw-options' primary={true} label='Change Color' onTouchTap={this.handleColorClick} />
           <RaisedButton className='draw-options' primary={true} label='Change Size' onTouchTap={this.handleSliderOpen} />
-          <RaisedButton className='draw-options' primary={true} label='Erase' />
+          <RaisedButton className='draw-options' primary={true} label='Erase' onTouchTap={this.handleEraser} />
         </span>
         <Popover
           open={this.state.sliderOpen}
@@ -193,7 +195,7 @@ class DrawArea extends React.Component {
           </span>
         </div>
         <Dialog
-          title='Are you sure you want to clear all?'
+          title='Are you sure you want to clear it all?'
           actions={actions}
           modal={true}
           open={this.state.clearAllOpen}
