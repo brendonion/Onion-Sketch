@@ -6,7 +6,8 @@ import { Redirect } from 'react-router-dom';
 import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 
-import ShapeTimer from './ShapeTimer'
+import DrawGame from './DrawGame';
+import ShapeTimer from './ShapeTimer';
 
 
 class DrawArea extends React.Component {
@@ -158,11 +159,11 @@ class DrawArea extends React.Component {
         onTouchTap={this.clearAll}
       />,
     ];
-
+    if (!this.state.prepped) {
     return (
       <div className='drawing-container'>
         {
-        !this.state.start 
+        !this.state.start && !this.state.prepped
         ? 
           <span className='start-container'>
             <RaisedButton secondary={true} label='DRAW A SHAPE' onTouchTap={this.handleStart} />
@@ -228,9 +229,13 @@ class DrawArea extends React.Component {
           />
         </div>
         }
-        {this.state.prepped ? <Redirect to='/game' /> : null}
       </div>
     );
+    } else {
+      return (
+        <DrawGame lines={this.state.lines} />
+      );
+    }
   }
 }
 

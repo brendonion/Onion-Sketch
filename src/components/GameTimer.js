@@ -12,6 +12,9 @@ class GameTimer extends Component {
     this.setState({
       currentCount: this.state.currentCount - 1
     });
+    if (this.state.currentCount <= 0) {
+      return this.props.handleGameFinish();
+    }
   }
 
   componentDidMount() {
