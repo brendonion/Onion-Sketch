@@ -165,7 +165,7 @@ class DrawArea extends React.Component {
         !this.state.start 
         ? 
           <span className='start-container'>
-            <RaisedButton secondary={true} label='START' onTouchTap={this.handleStart} />
+            <RaisedButton secondary={true} label='DRAW A SHAPE' onTouchTap={this.handleStart} />
           </span> 
         : 
         <div>
