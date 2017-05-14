@@ -89,7 +89,7 @@ class DrawArea extends React.Component {
     
     if (!this.state.prepped) {
       return (
-        <div className='drawing-container'>
+        <div className='drawing-container prep-container'>
           {
           !this.state.start && !this.state.prepped
           ? 

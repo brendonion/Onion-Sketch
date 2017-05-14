@@ -21,7 +21,7 @@ class DrawGame extends React.Component {
       slider: 5,
       start: false,
       finished: false,
-      concede: ''
+      concede: '',
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);

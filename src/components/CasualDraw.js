@@ -151,7 +151,7 @@ class CasualDraw extends React.Component {
     ];
 
     return (
-      <div className='drawing-container'>
+      <div className='drawing-container prep-container'>
         {
         !this.state.start 
         ? 
