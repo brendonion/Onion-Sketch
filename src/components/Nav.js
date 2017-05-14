@@ -20,6 +20,7 @@ class Nav extends Component {
           <span>
             <span className='user-email'>{this.props.user.email}</span>
             <Link to='/home' className='home-button'><RaisedButton><i className="fa fa-home" aria-hidden="true"></i></RaisedButton></Link>
+            <Link to='/casual' className='casual-button'><RaisedButton><i className="fa fa-coffee" aria-hidden="true"></i></RaisedButton></Link>
             <Link to='/canvas' className='canvas-button'><RaisedButton><i className="fa fa-pencil-square-o" aria-hidden="true"></i></RaisedButton></Link>
             <FlatButton
               label='Logout'

@@ -15,26 +15,20 @@ class DrawGame extends React.Component {
     this.state = {
       isDrawing: false,
       lines: new Immutable.List(),
-      colorOpen: false,
       clearAllOpen: false,
-      sliderOpen: false,
       strokeColor: 'black',
       slider: 5,
       start: false,
-      finished: false
+      finished: false,
+      concede: ''
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.clearAll = this.clearAll.bind(this);
-    this.handleColorClick = this.handleColorClick.bind(this);
     this.handleClearAllOpen = this.handleClearAllOpen.bind(this);
     this.handleClearAllClose = this.handleClearAllClose.bind(this);
-    this.changeLineColor = this.changeLineColor.bind(this);
-    this.handleSlider = this.handleSlider.bind(this);
-    this.handleSliderOpen = this.handleSliderOpen.bind(this);
-    this.handleSliderClose = this.handleSliderClose.bind(this);
     this.handleEraser = this.handleEraser.bind(this);
     this.handleStart = this.handleStart.bind(this);
     this.handleGameFinish = this.handleGameFinish.bind(this);
@@ -49,22 +43,7 @@ class DrawGame extends React.Component {
   }
 
   handleEraser() {
-    this.setState({strokeColor: 'white'});
-  }
-
-  handleSliderOpen(event) {
-    this.setState({
-      sliderOpen: !this.state.sliderOpen,
-      anchorEl: event.currentTarget
-    });
-  }
-
-  handleSliderClose() {
-    this.setState({sliderOpen: false});
-  }
-
-  handleColorClick() {
-    this.setState({colorOpen: !this.state.colorOpen});
+    this.setState({lines: this.props.lines});
   }
 
   handleClearAllOpen() {
@@ -73,6 +52,10 @@ class DrawGame extends React.Component {
 
   handleClearAllClose() {
     this.setState({clearAllOpen: false});
+  }
+
+  clearAll() {
+    this.setState({lines: new Immutable.List(), clearAllOpen: false, concede: 'You have conceded.'});
   }
 
   handleMouseDown(mouseEvent) {
@@ -107,23 +90,6 @@ class DrawGame extends React.Component {
     this.setState({isDrawing: false});
   }
 
-  handleSlider(event, value) {
-    this.setState({slider: value});
-    const path = document.getElementsByClassName('path');
-    try {
-      path[path.length].style.strokeWidth = `${this.state.slider}px`;
-    } catch(e) {}
-  }
-
-  changeLineColor(color, event) {
-    const path = document.getElementsByClassName('path');
-    let colorString = `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a})`;
-    this.setState({strokeColor: colorString});
-    try {
-      path[path.length].style.stroke = this.state.strokeColor;
-    } catch(e) {}
-  }
-
   relativeCoordinatesForEvent(mouseEvent) {
     const boundingRect = this.refs.drawArea.getBoundingClientRect();
     return new Immutable.Map({
@@ -132,9 +98,6 @@ class DrawGame extends React.Component {
     });
   }
 
-  clearAll() {
-    this.setState({lines: new Immutable.List(), clearAllOpen: false});
-  }
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
@@ -154,7 +117,7 @@ class DrawGame extends React.Component {
         onTouchTap={this.handleClearAllClose}
       />,
       <FlatButton
-        label="Clear All"
+        label="Concede"
         primary={true}
         onTouchTap={this.clearAll}
       />,
@@ -165,10 +128,15 @@ class DrawGame extends React.Component {
         <div className='drawing-container'>
           {
           !this.state.start 
-          ? 
-            <span className='start-container'>
-              <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
-            </span>
+          ? <div>
+              <span className='start-container'>
+                <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
+              </span>
+              <div className='drawArea'>
+                <Drawing lines={this.state.lines} />
+                <p className='concede'>{this.state.concede}</p>
+              </div>
+            </div>
           : 
           <div>
             <GameTimer handleGameFinish={this.handleGameFinish} />
@@ -176,54 +144,11 @@ class DrawGame extends React.Component {
               <Drawing lines={this.state.lines} />
             </div>
             <span className='button-container'>
-              <RaisedButton className='draw-options' primary={true} label='Clear All' onTouchTap={this.handleClearAllOpen}/>
-              <RaisedButton className='draw-options' primary={true} label='Change Color' onTouchTap={this.handleColorClick} />
-              <RaisedButton className='draw-options' primary={true} label='Change Size' onTouchTap={this.handleSliderOpen} />
-              <RaisedButton className='draw-options' primary={true} label='Erase' onTouchTap={this.handleEraser} />
+              <RaisedButton className='draw-options' primary={true} label='Concede' onTouchTap={this.handleClearAllOpen}/>
+              <RaisedButton className='draw-options' primary={true} label='Reset' onTouchTap={this.handleEraser} />
             </span>
-            <Popover
-              open={this.state.colorOpen}
-              anchorEl={this.state.anchorEl}
-              anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
-              targetOrigin={{horizontal: 'middle', vertical: 'top'}}
-              onRequestClose={this.handleColorClick}
-              animation={PopoverAnimationVertical}
-            >
-              <Menu>
-                <MenuItem primaryText='Adjust Stroke Color'>
-                  <SketchPicker color={this.state.strokeColor} onChangeComplete={this.changeLineColor} />
-                  <p>{this.state.strokeColor}</p>
-                </MenuItem>
-              </Menu>
-            </Popover>
-            <Popover
-              open={this.state.sliderOpen}
-              anchorEl={this.state.anchorEl}
-              anchorOrigin={{horizontal: 'middle', vertical: 'bottom'}}
-              targetOrigin={{horizontal: 'middle', vertical: 'top'}}
-              onRequestClose={this.handleSliderClose}
-              animation={PopoverAnimationVertical}
-            >
-              <Menu>
-                <MenuItem primaryText='Adjust Stroke Size'>
-                  <Slider
-                    min={1}
-                    max={50}
-                    step={1}
-                    value={this.state.slider}
-                    onChange={this.handleSlider}
-                  />
-                  <p>{this.state.slider}px</p>
-                </MenuItem>
-              </Menu>
-            </Popover>
-            <div className='stroke-info'>
-              <span className='stroke-container'>
-                <i style={{color: this.state.strokeColor, fontSize: `${this.state.slider}px`}} className="fa fa-circle" aria-hidden="true"></i>
-              </span>
-            </div>
             <Dialog
-              title='Are you sure you want to clear it all?'
+              title='Are you sure you want to give up?'
               actions={actions}
               modal={true}
               open={this.state.clearAllOpen}
