@@ -99,7 +99,7 @@ class DrawArea extends React.Component {
           : 
           <div>
             <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
-            <p className='shape-prompt'>Draw a shape quickly!</p>
+            <h3 className='shape-prompt'>Draw a shape quickly!</h3>
             <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
               <Drawing lines={this.state.lines} />
             </div>

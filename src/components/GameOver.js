@@ -9,17 +9,23 @@ class GameOver extends React.Component {
     super();
     this.state = {
       lines: new Immutable.List(),
+      shape: new Immutable.List()
     };
   }
 
   componentDidMount() {
-    this.setState({lines: this.props.lines});
+    this.setState({lines: this.props.lines, shape: this.props.shape});
   }
 
   render() {
     
     return (
       <div className='drawing-container'>
+        <h3 className='prompt'>Before...</h3>
+        <div className='drawArea' ref='drawArea'>
+          <Drawing lines={this.state.shape} />
+        </div>
+        <h3 className='prompt'>After...</h3>
         <div className='drawArea' ref='drawArea'>
           <Drawing lines={this.state.lines} />
         </div>

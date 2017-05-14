@@ -14,6 +14,7 @@ class DrawGame extends React.Component {
     super();
     this.state = {
       isDrawing: false,
+      shape: new Immutable.List(),
       lines: new Immutable.List(),
       clearAllOpen: false,
       strokeColor: 'black',
@@ -101,7 +102,7 @@ class DrawGame extends React.Component {
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
-    this.setState({lines: this.props.lines});
+    this.setState({lines: this.props.lines, shape: this.props.lines});
   }
   
   componentWillUnmount() {
@@ -132,7 +133,7 @@ class DrawGame extends React.Component {
               <span className='start-container'>
                 <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
               </span>
-              <div className='drawArea'>
+              <div className='draw-prep'>
                 <Drawing lines={this.state.lines} />
                 <p className='concede'>{this.state.concede}</p>
               </div>
@@ -159,7 +160,7 @@ class DrawGame extends React.Component {
       );
     } else {
       return (
-        <GameOver lines={this.state.lines} />
+        <GameOver lines={this.state.lines} shape={this.state.shape} />
       );
     }
   }

@@ -12,6 +12,11 @@ $dark-paper: #94c2d1;
   margin-bottom: 20px;
 }
 
+.prompt {
+  text-align: center;
+  margin: 10px 0;
+}
+
 .drawing-container {
   background: $paper;
   padding: 20px;
@@ -38,6 +43,15 @@ $dark-paper: #94c2d1;
   height: 600px;
   border-radius: 4px;
   cursor: url('../../public/images/circle-pointer.png') 5 5, crosshair;
+  margin: auto;
+  margin-top: 1.5%;
+}
+
+.draw-prep {
+  width: 75%;
+  height: 600px;
+  border-radius: 4px;
+  cursor: crosshair;
   margin: auto;
   margin-top: 1.5%;
 }
