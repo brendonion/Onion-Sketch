@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
-import { SketchPicker } from 'react-color';
 
-import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog} from 'material-ui';
+import {RaisedButton, FlatButton, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 
 import GameTimer from './GameTimer';
@@ -55,9 +55,6 @@ class DrawGame extends React.Component {
     this.setState({clearAllOpen: false});
   }
 
-  clearAll() {
-    this.setState({lines: new Immutable.List(), clearAllOpen: false, concede: 'You have conceded.'});
-  }
 
   handleMouseDown(mouseEvent) {
     if (mouseEvent.button != 0) {
@@ -89,6 +86,10 @@ class DrawGame extends React.Component {
 
   handleMouseUp() {
     this.setState({isDrawing: false});
+  }
+
+  clearAll() {
+    this.setState({lines: new Immutable.List(), clearAllOpen: false, concede: 'You have conceded.'});
   }
 
   relativeCoordinatesForEvent(mouseEvent) {
@@ -135,7 +136,6 @@ class DrawGame extends React.Component {
               </span>
               <div className='draw-prep'>
                 <Drawing lines={this.state.lines} />
-                <p className='concede'>{this.state.concede}</p>
               </div>
             </div>
           : 
