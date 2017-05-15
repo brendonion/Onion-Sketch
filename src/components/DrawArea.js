@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Immutable from 'immutable';
 import { SketchPicker } from 'react-color';
 import { Redirect } from 'react-router-dom';
+import io from 'socket.io-client';
 
 import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
@@ -9,6 +10,7 @@ import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import DrawGame from './DrawGame';
 import ShapeTimer from './ShapeTimer';
 
+let socket;
 
 class DrawArea extends React.Component {
   constructor() {
@@ -21,7 +23,7 @@ class DrawArea extends React.Component {
       start: false,
       prepped: false
     };
-
+    socket = io.connect('http://localhost:3000');
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -31,6 +33,8 @@ class DrawArea extends React.Component {
 
   handleShapeFinish() {
     this.setState({prepped: true});
+    console.log('shape done');
+    socket.emit('client:finishedShape', { value: 'client sent this' });
   }
 
   handleStart() {
