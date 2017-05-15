@@ -9,6 +9,8 @@ const router = express.Router();
 const publicPath = path.resolve(__dirname, 'public');
 
 const app = express();
+var server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 bundle();
 
