@@ -15,7 +15,8 @@ const app = express();
 const server = http.Server(app);
 const io = socketio(server);
 
-// server.listen(3001, () => console.log('listening on *:3001'));
+let users = [];
+let rooms = [];
 
 bundle();
 
@@ -39,11 +40,40 @@ proxy.on('error', (e) => {
   console.log('Could not connect to proxy please try again');
 });
 
+// TODO join a game room by having the client create the room
+let clients = {};
+
 io.on('connection', (socket) => {
   console.log('connected', socket.id);
 
+  socket.on('client:roomCreated', (room) => {
+    if (clients[room] == undefined) {
+      clients[room] = 1;
+    }
+    io.sockets.emit('server:roomCreated', room);
+  })
+
+  // socket.on('client:roomJoined', (room) => {
+  //   if (clients[room] == undefined) {
+  //     clients[room] = 1;
+  //     socket.join(room);
+  //     console.log('1 in room: ', room);
+  //     socket.broadcast('server:roomJoined', room);
+  //     return;
+  //   } else if (clients[room] == 1) {
+  //     clients[room] = 2;
+  //     socket.join(room);
+  //     console.log('2 in room ', room);
+  //     return;
+  //   } else {
+  //     console.log('room full');
+  //     return;
+  //   }
+  // });
+  // socket.join('gameroom ' + rooms[users.length - 1]);
+  
   socket.on('client:finishedShape', (data) => {
-    console.log('data', data);
+    console.log('data', data.value);
   });
 
   socket.on('disconnect', () => {
