@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Route, BrowserRouter, Link, Redirect, Switch } from 'react-router-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import io from 'socket.io-client';
 
 import './styles/App.scss';
 
@@ -20,6 +21,8 @@ import { firebaseAuth } from './services/Firebase';
 
 injectTapEventPlugin();
 
+let socket;
+
 class App extends Component {
   
   constructor(props) {
@@ -27,8 +30,10 @@ class App extends Component {
     this.state = {
       authed: false,
       loading: true,
-      user: null
+      user: null,
+      listOfRooms: []
     }
+    socket = io.connect('http://localhost:3000');
   }
 
   componentDidMount() {
@@ -46,7 +51,19 @@ class App extends Component {
           user: null
         })
       }
-    })
+    });
+
+    socket.on('server:roomCreated', (data) => {
+      console.log('data', data);
+      this.state.listOfRooms.push(data);
+      this.setState({listOfRooms: this.state.listOfRooms});
+    });
+  }
+
+  theDrawArea() {
+    return (
+      <DrawArea listOfRooms={this.state.listOfRooms} />
+    );
   }
 
   componentWillUnmount() {
@@ -66,7 +83,7 @@ class App extends Component {
                   <Route authed={this.state.authed} path='/login' component={Login} />
                   <Route authed={this.state.authed} path='/register' component={Register} />
                   <Route authed={this.state.authed} path='/home' component={Home} />
-                  <Route authed={this.state.authed} path='/canvas' component={DrawArea} />
+                  <Route authed={this.state.authed} path='/canvas' component={this.theDrawArea.bind(this)} />
                   <Route authed={this.state.authed} path='/game' component={DrawGame} />
                   <Route authed={this.state.authed} path='/gameover' component={GameOver} />
                   <Route authed={this.state.authed} path='/casual' component={CasualDraw} />

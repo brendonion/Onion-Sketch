@@ -32,7 +32,8 @@ class Register extends Component {
         <h1>Register</h1>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <div>
-            <TextField 
+            <TextField
+              className='email-field'
               ref={(email) => this.email = email}
               floatingLabelText='Email'
               type='email'
@@ -40,12 +41,14 @@ class Register extends Component {
           </div>
           <div>
             <TextField 
+              className='password-field'
               ref={(pass) => this.pass = pass}
               floatingLabelText='Password'
               type='password'
             />
           </div>
-          <RaisedButton 
+          <RaisedButton
+            className='register-submit'
             type='submit'
             label='Submit'
             secondary={true}
