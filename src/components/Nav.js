@@ -23,7 +23,7 @@ class Nav extends Component {
             <Link to='/casual' className='casual-button'><RaisedButton><i className="fa fa-coffee" aria-hidden="true"></i></RaisedButton></Link>
             <Link to='/canvas' className='canvas-button'><RaisedButton><i className="fa fa-pencil-square-o" aria-hidden="true"></i></RaisedButton></Link>
             <FlatButton
-              name='logout-button'
+              className='logout-button'
               label='Logout'
               primary={false}
               onTouchTap={() => { logout(); }}
