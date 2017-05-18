@@ -17,6 +17,8 @@ const io = socketio(server);
 
 let users = [];
 let rooms = [];
+let clients = {};
+
 
 bundle();
 
@@ -41,7 +43,6 @@ proxy.on('error', (e) => {
 });
 
 // TODO join a game room by having the client create the room
-let clients = {};
 
 io.on('connection', (socket) => {
   console.log('connected', socket.id);

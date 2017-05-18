@@ -31,9 +31,9 @@ class App extends Component {
       authed: false,
       loading: true,
       user: null,
-      listOfRooms: []
+      listOfRooms: [],
+      socket: io.connect('http://localhost:3000')
     }
-    socket = io.connect('http://localhost:3000');
   }
 
   componentDidMount() {
@@ -53,7 +53,7 @@ class App extends Component {
       }
     });
 
-    socket.on('server:roomCreated', (data) => {
+    this.state.socket.on('server:roomCreated', (data) => {
       console.log('data', data);
       this.state.listOfRooms.push(data);
       this.setState({listOfRooms: this.state.listOfRooms});
@@ -62,7 +62,7 @@ class App extends Component {
 
   theDrawArea() {
     return (
-      <DrawArea listOfRooms={this.state.listOfRooms} />
+      <DrawArea listOfRooms={this.state.listOfRooms} socket={this.state.socket} />
     );
   }
 
