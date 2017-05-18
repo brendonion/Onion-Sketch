@@ -25,6 +25,7 @@ class DrawArea extends React.Component {
       prepped: false,
       roomJoined: false,
       room: '',
+      enoughPlayers: false,
       listOfRooms: []
     };
 
@@ -130,21 +131,21 @@ class DrawArea extends React.Component {
       return;
     } else {
       console.log('room made');
-      this.setState({room: this.title.getValue(), roomJoined: true});
       this.state.socket.emit('client:roomCreated', this.title.getValue());
-      //this.handleStart();
       this.handleClose(event);
     }
   }
 
-  findRoom() {
-    this.setState({room: event.target.innerHTML, roomJoined: true});
+  // TODO emit event that the client has joined a room
+  findRoom(event) {
+    this.state.socket.emit('client:roomJoined', event.target.innerHTML);
+    //this.setState({room: event.target.innerHTML, roomJoined: true});
     this.handleRoomListClose();
   }
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
-    this.setState({listOfRooms: this.props.listOfRooms, socket: this.props.socket});
+    this.setState({listOfRooms: this.props.listOfRooms, socket: this.props.socket, room: this.props.room, roomJoined: this.props.roomJoined});
     // socket.on('server:roomCreated', (data) => {
     //   console.log('data', data);
     //   this.state.listOfRooms.push(data)
@@ -160,6 +161,10 @@ class DrawArea extends React.Component {
         this.state.listOfRooms.push(data);
         this.setState({listOfRooms: this.state.listOfRooms});
       }
+    });
+    this.state.socket.on('server:enoughPlayers', (data) => {
+      console.log('enough players data', data);
+      this.setState({room: data, roomJoined: true, enoughPlayers: true});
     });
   }
   
@@ -183,17 +188,13 @@ class DrawArea extends React.Component {
       />
     ];
 
-    // ISSUE: User is constantly being disconnected and reconnected with a different socket ID, 
-    // which causes roomJoined to reset
-
     console.log('room', this.state.room);
     console.log('roomJoined?', this.state.roomJoined);
-    // TODO get the dropdown menu working ie display all the rooms
     if (!this.state.prepped) {
       return (
         <div className='drawing-container prep-container'>
           {
-          !this.state.start && !this.state.roomJoined
+          !this.state.start || !this.state.roomJoined || !this.state.room || !this.state.enoughPlayers
           ? 
             <span className='start-container'>
               <RaisedButton secondary={true} label='Create a Room' onTouchTap={(event) => this.handleOpen(event)} />
@@ -202,6 +203,7 @@ class DrawArea extends React.Component {
             </span> 
           : 
           <div>
+            <h3>In Room: {this.state.room}</h3>
             <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
             <h3 className='shape-prompt'>Draw a shape quickly!</h3>
             <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
