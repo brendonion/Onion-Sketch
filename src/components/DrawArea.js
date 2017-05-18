@@ -4,13 +4,12 @@ import { SketchPicker } from 'react-color';
 import { Redirect } from 'react-router-dom';
 import io from 'socket.io-client';
 
-import {RaisedButton, FlatButton, Slider, Menu, MenuItem, Dialog, TextField, DropDownMenu} from 'material-ui';
+import {RaisedButton, FlatButton, Menu, MenuItem, Dialog, TextField, DropDownMenu} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 
 import DrawGame from './DrawGame';
 import ShapeTimer from './ShapeTimer';
 
-let socket;
 
 class DrawArea extends React.Component {
   constructor() {
@@ -26,10 +25,10 @@ class DrawArea extends React.Component {
       prepped: false,
       roomJoined: false,
       room: '',
+      enoughPlayers: false,
       listOfRooms: []
     };
 
-    socket = io.connect('http://localhost:3000');
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -43,18 +42,20 @@ class DrawArea extends React.Component {
     this.findRoom = this.findRoom.bind(this);
   }
 
-  handleOpen() {
+  handleOpen(event) {
+    event.preventDefault();
     this.setState({open: true});
   };
 
-  handleClose() {
+  handleClose(event) {
+    event.preventDefault();
     this.setState({open: false});
   };
 
   handleShapeFinish() {
     this.setState({prepped: true});
     console.log('shape done');
-    socket.emit('client:finishedShape', { value: this.state.lines });
+    this.state.socket.emit('client:finishedShape', { value: this.state.lines });
   }
 
   handleStart() {
@@ -119,48 +120,53 @@ class DrawArea extends React.Component {
   // Only let the game begin once the room has 2 people
 
   // issue with setState(...)
-  makeRoom() {
+  makeRoom(event) {
+    event.preventDefault();
     console.log('rooms', this.state.listOfRooms);
     if ((this.state.listOfRooms).includes(this.title.getValue())) {
       console.log('room already taken');
       return;
+    } else if (this.title.getValue() == '') {
+      console.log('room cannot be blank');
+      return;
     } else {
-      this.setState({room: this.title.getValue(), roomJoined: true});
-      socket.emit('client:roomCreated', this.title.getValue());
-      //this.handleStart();
-      this.handleClose();
+      console.log('room made');
+      this.state.socket.emit('client:roomCreated', this.title.getValue());
+      this.handleClose(event);
     }
   }
 
-  findRoom() {
-    console.log('Room found!');
+  // TODO emit event that the client has joined a room
+  findRoom(event) {
+    this.state.socket.emit('client:roomJoined', event.target.innerHTML);
+    //this.setState({room: event.target.innerHTML, roomJoined: true});
+    this.handleRoomListClose();
   }
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
-    this.setState({listOfRooms: this.props.listOfRooms});
-    // socket.on('server:connection', (data) => {
-    //   this.setState({socketId: data});
-    // });
+    this.setState({listOfRooms: this.props.listOfRooms, socket: this.props.socket, room: this.props.room, roomJoined: this.props.roomJoined});
     // socket.on('server:roomCreated', (data) => {
     //   console.log('data', data);
     //   this.state.listOfRooms.push(data)
     //   this.setState({listOfRooms: this.state.listOfRooms});
     // });
-    console.log(this.state.listOfRooms);
   }
 
   componentDidUpdate() {
-    socket.on('server:roomCreated', (data) => {
+    this.state.socket.on('server:roomCreated', (data) => {
       if ((this.state.listOfRooms).includes(data)) {
         return;
       } else {
-        console.log('data', data);
-        this.state.listOfRooms.push(data)
+        this.state.listOfRooms.push(data);
         this.setState({listOfRooms: this.state.listOfRooms});
       }
     });
-  } 
+    this.state.socket.on('server:enoughPlayers', (data) => {
+      console.log('enough players data', data);
+      this.setState({room: data, roomJoined: true, enoughPlayers: true});
+    });
+  }
   
   componentWillUnmount() {
     document.removeEventListener('mouseup', this.handleMouseUp);
@@ -173,29 +179,31 @@ class DrawArea extends React.Component {
       <FlatButton
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleClose}
+        onTouchTap={(event) => this.handleClose(event)}
       />,
       <FlatButton
         label="Submit"
         primary={true}
-        onTouchTap={this.makeRoom}
-      />,
+        onTouchTap={(event) => this.makeRoom(event)}
+      />
     ];
 
-    // TODO get the dropdown menu working ie display all the rooms
+    console.log('room', this.state.room);
+    console.log('roomJoined?', this.state.roomJoined);
     if (!this.state.prepped) {
       return (
         <div className='drawing-container prep-container'>
           {
-          !this.state.start //&& !this.state.roomJoined)
+          !this.state.start || !this.state.roomJoined || !this.state.room || !this.state.enoughPlayers
           ? 
             <span className='start-container'>
-              <RaisedButton secondary={true} label='Create a Room' onTouchTap={this.handleOpen} />
-              <RaisedButton secondary={true} label='Join a Room' onTouchTap={this.handleRoomListOpen} />
-              <RaisedButton secondary={true} label='DRAW A SHAPE' onTouchTap={this.handleStart} />
+              <RaisedButton secondary={true} label='Create a Room' onTouchTap={(event) => this.handleOpen(event)} />
+              <RaisedButton secondary={true} label='Join a Room' onTouchTap={(event) => this.handleRoomListOpen(event)} />
+              <RaisedButton secondary={true} label='DRAW A SHAPE' onTouchTap={() => this.handleStart()} />
             </span> 
           : 
           <div>
+            <h3>In Room: {this.state.room}</h3>
             <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
             <h3 className='shape-prompt'>Draw a shape quickly!</h3>
             <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
@@ -212,6 +220,7 @@ class DrawArea extends React.Component {
             <TextField
               id='text-field-default'
               ref={(title) => this.title = title}
+              autoFocus={true}
             />
           </Dialog>
           <Popover
@@ -219,11 +228,11 @@ class DrawArea extends React.Component {
             anchorEl={this.state.anchorEl}
             anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
             targetOrigin={{horizontal: 'left', vertical: 'top'}}
-            onRequestClose={this.handleRoomListClose}
+            onRequestClose={() => this.handleRoomListClose()}
           >
             <Menu>
               {this.state.listOfRooms.map((room, index) => {
-                return <MenuItem key={index} primaryText={room} />
+                return <MenuItem key={index} primaryText={room} onTouchTap={(event) => this.findRoom(event)} />
               })}
             </Menu>
           </Popover>

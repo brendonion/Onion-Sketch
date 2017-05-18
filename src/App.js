@@ -31,9 +31,11 @@ class App extends Component {
       authed: false,
       loading: true,
       user: null,
-      listOfRooms: []
+      listOfRooms: [],
+      room: '',
+      roomJoined: false,
+      socket: io.connect('http://localhost:3000')
     }
-    socket = io.connect('http://localhost:3000');
   }
 
   componentDidMount() {
@@ -42,7 +44,7 @@ class App extends Component {
         this.setState({
           authed: true,
           loading: false,
-          user: user
+          user: user,
         })
       } else {
         this.setState({
@@ -53,16 +55,24 @@ class App extends Component {
       }
     });
 
-    socket.on('server:roomCreated', (data) => {
-      console.log('data', data);
+    this.state.socket.on('server:roomCreated', (data) => {
       this.state.listOfRooms.push(data);
-      this.setState({listOfRooms: this.state.listOfRooms});
+      this.setState({listOfRooms: this.state.listOfRooms });
+    });
+
+    this.state.socket.on('server:roomJoined', (data) => {
+      this.setState({room: data, roomJoined: true});
     });
   }
 
   theDrawArea() {
     return (
-      <DrawArea listOfRooms={this.state.listOfRooms} />
+      <DrawArea 
+        socket={this.state.socket} 
+        listOfRooms={this.state.listOfRooms} 
+        room={this.state.room}  
+        roomJoined={this.state.roomJoined} 
+      />
     );
   }
 
