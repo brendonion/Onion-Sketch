@@ -145,7 +145,11 @@ class DrawArea extends React.Component {
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
-    this.setState({listOfRooms: this.props.listOfRooms, socket: this.props.socket, room: this.props.room, roomJoined: this.props.roomJoined});
+    this.setState({
+      listOfRooms: this.props.listOfRooms, 
+      socket: this.props.socket, room: this.props.room, 
+      roomJoined: this.props.roomJoined
+    });
     // socket.on('server:roomCreated', (data) => {
     //   console.log('data', data);
     //   this.state.listOfRooms.push(data)
@@ -190,33 +194,25 @@ class DrawArea extends React.Component {
 
     console.log('room', this.state.room);
     console.log('roomJoined?', this.state.roomJoined);
-    if (!this.state.prepped) {
+    if (!this.state.start || !this.state.room || !this.state.roomJoined) {
       return (
         <div className='drawing-container prep-container'>
-          {
-          !this.state.start || !this.state.roomJoined || !this.state.room || !this.state.enoughPlayers
-          ? 
-            <span className='start-container'>
-              <RaisedButton secondary={true} label='Create a Room' onTouchTap={(event) => this.handleOpen(event)} />
-              <RaisedButton secondary={true} label='Join a Room' onTouchTap={(event) => this.handleRoomListOpen(event)} />
-              <RaisedButton secondary={true} label='DRAW A SHAPE' onTouchTap={() => this.handleStart()} />
-            </span> 
-          : 
-          <div>
-            <h3>In Room: {this.state.room}</h3>
-            <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
-            <h3 className='shape-prompt'>Draw a shape quickly!</h3>
-            <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
-              <Drawing lines={this.state.lines} />
-            </div>
-          </div>
-          }
+          <span className='start-container'>
+            <RaisedButton secondary={true} label='Create a Room' onTouchTap={(event) => this.handleOpen(event)} />
+            <RaisedButton secondary={true} label='Join a Room' onTouchTap={(event) => this.handleRoomListOpen(event)} />
+              {
+                !this.state.roomJoined 
+                ? <RaisedButton label='Cannot Start' /> 
+                : <RaisedButton secondary={true} label='Start' onTouchTap={() => this.handleStart()} /> 
+              }
+          </span>
           <Dialog
             title='Make A Room...'
             actions={actions}
             modal={true}
             open={this.state.open}
           >
+            <p>Room: {this.refs.title}</p>
             <TextField
               id='text-field-default'
               ref={(title) => this.title = title}
@@ -238,9 +234,34 @@ class DrawArea extends React.Component {
           </Popover>
         </div>
       );
+    } else if (this.state.start && !this.state.enoughPlayers) {
+      return (
+        <div className='drawing-container prep-container'>
+          <h1 className='waiting-prompt'>Waiting for players...</h1>
+          <RaisedButton label='cancel'/>
+        </div>
+      );
+    } else if (this.state.start && this.state.enoughPlayers && !this.state.prepped) {
+      return (
+          <div className='drawing-container prep-container'>
+            <div>
+              <h3>In Room: {this.state.room}</h3>
+              <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
+              <h3 className='shape-prompt'>Draw a shape quickly!</h3>
+              <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
+                <Drawing lines={this.state.lines} />
+              </div>
+            </div>
+        </div>
+      );
     } else {
       return (
-        <DrawGame lines={this.state.lines} />
+        <DrawGame 
+          lines={this.state.lines} 
+          room={this.state.room} 
+          roomJoined={this.state.roomJoined}
+          socket={this.state.socket}
+        />
       );
     }
   }
