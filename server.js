@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
 
   socket.on('client:roomCreated', (room) => {
     if (clients[room] == undefined) {
-      clients[room] = {players: 1, creator: socket.id, playersReady: 0};
+      clients[room] = {players: 1, creator: socket.id, startPressed: 0, playersReady: 0};
       socket.join(room);
       io.sockets.in(room).emit('server:roomJoined', room);
     }
@@ -68,6 +68,17 @@ io.on('connection', (socket) => {
       return;
     } else {
       console.log('room full');
+      return;
+    }
+  });
+
+  socket.on('client:waitForStart', (room) => {
+    if (clients[room].startPressed == 0) {
+      clients[room].startPressed = 1;
+    } else if (clients[room].startPressed == 1) {
+      clients[room].startPressed = 2;
+      io.sockets.in(room).emit('server:prepStart');
+    } else {
       return;
     }
   });

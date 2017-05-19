@@ -22,6 +22,7 @@ class DrawArea extends React.Component {
       listOpen: false,
       open: false,
       start: false,
+      prepStart: false,
       prepped: false,
       roomJoined: false,
       room: '',
@@ -60,6 +61,7 @@ class DrawArea extends React.Component {
 
   handleStart() {
     this.setState({start: true});
+    this.state.socket.emit('client:waitForStart', this.state.room);
   }
 
   handleMouseDown(mouseEvent) {
@@ -147,14 +149,10 @@ class DrawArea extends React.Component {
     document.addEventListener('mouseup', this.handleMouseUp);
     this.setState({
       listOfRooms: this.props.listOfRooms, 
-      socket: this.props.socket, room: this.props.room, 
+      socket: this.props.socket, 
+      room: this.props.room, 
       roomJoined: this.props.roomJoined
     });
-    // socket.on('server:roomCreated', (data) => {
-    //   console.log('data', data);
-    //   this.state.listOfRooms.push(data)
-    //   this.setState({listOfRooms: this.state.listOfRooms});
-    // });
   }
 
   componentDidUpdate() {
@@ -166,9 +164,13 @@ class DrawArea extends React.Component {
         this.setState({listOfRooms: this.state.listOfRooms});
       }
     });
+
     this.state.socket.on('server:enoughPlayers', (data) => {
-      console.log('enough players data', data);
       this.setState({room: data, roomJoined: true, enoughPlayers: true});
+    });
+
+    this.state.socket.on('server:prepStart', () => {
+      this.setState({prepStart: true});
     });
   }
   
@@ -212,7 +214,6 @@ class DrawArea extends React.Component {
             modal={true}
             open={this.state.open}
           >
-            <p>Room: {this.refs.title}</p>
             <TextField
               id='text-field-default'
               ref={(title) => this.title = title}
@@ -234,14 +235,14 @@ class DrawArea extends React.Component {
           </Popover>
         </div>
       );
-    } else if (this.state.start && !this.state.enoughPlayers) {
+    } else if (this.state.start && this.state.room && this.state.roomJoined && (!this.state.enoughPlayers || !this.state.prepStart) && !this.state.prepped) {
       return (
         <div className='drawing-container prep-container'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
           <RaisedButton label='cancel'/>
         </div>
       );
-    } else if (this.state.start && this.state.enoughPlayers && !this.state.prepped) {
+    } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped) {
       return (
           <div className='drawing-container prep-container'>
             <div>
