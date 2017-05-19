@@ -46,12 +46,12 @@ class DrawArea extends React.Component {
   handleOpen(event) {
     event.preventDefault();
     this.setState({open: true});
-  };
+  }
 
   handleClose(event) {
     event.preventDefault();
     this.setState({open: false});
-  };
+  }
 
   handleShapeFinish() {
     this.setState({prepped: true});
@@ -102,13 +102,13 @@ class DrawArea extends React.Component {
       listOpen: true,
       anchorEl: event.currentTarget,
     });
-  };
+  }
 
   handleRoomListClose() {
     this.setState({
       listOpen: false
     });
-  };
+  }
 
   relativeCoordinatesForEvent(mouseEvent) {
     const boundingRect = this.refs.drawArea.getBoundingClientRect();
@@ -138,10 +138,9 @@ class DrawArea extends React.Component {
     }
   }
 
-  // TODO emit event that the client has joined a room
   findRoom(event) {
+    event.preventDefault();
     this.state.socket.emit('client:roomJoined', event.target.innerHTML);
-    //this.setState({room: event.target.innerHTML, roomJoined: true});
     this.handleRoomListClose();
   }
 
@@ -165,8 +164,9 @@ class DrawArea extends React.Component {
       }
     });
 
+    // Causing the setState(...) error
     this.state.socket.on('server:enoughPlayers', (data) => {
-      this.setState({room: data, roomJoined: true, enoughPlayers: true});
+      this.setState({enoughPlayers: true, room: data, roomJoined: true});
     });
 
     this.state.socket.on('server:prepStart', () => {
@@ -176,7 +176,6 @@ class DrawArea extends React.Component {
   
   componentWillUnmount() {
     document.removeEventListener('mouseup', this.handleMouseUp);
-    // socket.disconnect();
   }
 
   render() {

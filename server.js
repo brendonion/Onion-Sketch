@@ -62,12 +62,8 @@ io.on('connection', (socket) => {
       socket.join(room);
       console.log('2 in room: ', room);
       io.sockets.in(room).emit('server:enoughPlayers', room);
-    } else if (clients[room].players == 2) {
-      return;
-      console.log('2 in room already, cannot join ', room);
-      return;
     } else {
-      console.log('room full');
+      console.log('2 in room already, cannot join ', room);
       return;
     }
   });

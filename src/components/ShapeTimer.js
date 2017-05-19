@@ -8,7 +8,6 @@ class ShapeTimer extends Component {
     this.state = {currentCount: 5}
   }
 
-
   timer() {
     this.setState({
       currentCount: this.state.currentCount - 1
