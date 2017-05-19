@@ -49,8 +49,7 @@ io.on('connection', (socket) => {
 
   socket.on('client:roomCreated', (room) => {
     if (clients[room] == undefined) {
-      clients[room] = {players: 1, creator: socket.id};
-      // clients[room].creator = socket.id;
+      clients[room] = {players: 1, creator: socket.id, playersReady: 0};
       socket.join(room);
       io.sockets.in(room).emit('server:roomJoined', room);
     }
@@ -72,7 +71,17 @@ io.on('connection', (socket) => {
       return;
     }
   });
-  // socket.join('gameroom ' + rooms[users.length - 1]);
+
+  socket.on('client:playerIsReady', (room) => {
+    if (clients[room].playersReady == 0) {
+      clients[room].playersReady = 1;
+    } else if (clients[room].playersReady == 1) {
+      clients[room].playersReady = 2;
+      io.sockets.in(room).emit('server:playersReady');
+    } else {
+      return;
+    }
+  });
   
   socket.on('client:finishedShape', (data) => {
     console.log('data', data.value);

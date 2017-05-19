@@ -19,7 +19,11 @@ class DrawGame extends React.Component {
       clearAllOpen: false,
       strokeColor: 'black',
       slider: 5,
+      socket: '',
       start: false,
+      gameReady: false,
+      room: '',
+      roomJoined: false,
       finished: false,
       concede: '',
     };
@@ -40,7 +44,10 @@ class DrawGame extends React.Component {
   }
 
   handleStart() {
-    this.setState({start: true});
+    this.setState({
+      start: true
+    });
+    this.state.socket.emit('client:playerIsReady', this.state.room);
   }
 
   handleEraser() {
@@ -103,9 +110,23 @@ class DrawGame extends React.Component {
 
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
-    this.setState({lines: this.props.lines, shape: this.props.lines});
+    this.setState({
+      lines: this.props.lines, 
+      shape: this.props.lines,
+      socket: this.props.socket,
+      room: this.props.room,
+      roomJoined: this.props.roomJoined
+    });
   }
   
+  componentDidUpdate() {
+    this.state.socket.on('server:playersReady', () => {
+      this.setState({
+        gameReady: true
+      });
+    });
+  }
+
   componentWillUnmount() {
     document.removeEventListener('mouseup', this.handleMouseUp);
   }
@@ -125,20 +146,28 @@ class DrawGame extends React.Component {
       />,
     ];
 
-    if (!this.state.finished) {
+    if (!this.state.start) {
       return (
         <div className='drawing-container'>
-          {
-          !this.state.start 
-          ? <div>
-              <span className='start-container'>
-                <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
-              </span>
-              <div className='draw-prep'>
-                <Drawing lines={this.state.lines} />
-              </div>
+          <div>
+            <span className='start-container'>
+              <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
+            </span>
+            <div className='draw-prep'>
+              <Drawing lines={this.state.lines} />
             </div>
-          : 
+          </div>
+        </div>
+      );
+    } else if (this.state.start && !this.state.gameReady) {
+      return (
+        <div className='drawing-conainer'>
+          <h1 className='waiting-prompt'>Waiting for players...</h1>
+        </div>
+      );
+    } else if (this.state.start && this.state.gameReady && !this.state.finished) {
+      return (
+        <div className='drawing-container'>
           <div>
             <GameTimer handleGameFinish={this.handleGameFinish} />
             <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
@@ -155,7 +184,6 @@ class DrawGame extends React.Component {
               open={this.state.clearAllOpen}
             />
           </div>
-          }
         </div>
       );
     } else {
