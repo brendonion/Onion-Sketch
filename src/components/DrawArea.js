@@ -36,6 +36,7 @@ class DrawArea extends React.Component {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleStart = this.handleStart.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
     this.handleShapeFinish = this.handleShapeFinish.bind(this);
     this.handleRoomListOpen = this.handleRoomListOpen.bind(this);
     this.handleRoomListClose = this.handleRoomListClose.bind(this);
@@ -62,6 +63,11 @@ class DrawArea extends React.Component {
   handleStart() {
     this.setState({start: true});
     this.state.socket.emit('client:waitForStart', this.state.room);
+  }
+
+  handleCancel() {
+    this.setState({start: false});
+    this.state.socket.emit('client:cancelStart', this.state.room);
   }
 
   handleMouseDown(mouseEvent) {
@@ -238,7 +244,7 @@ class DrawArea extends React.Component {
       return (
         <div className='drawing-container prep-container'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
-          <RaisedButton label='cancel'/>
+          <RaisedButton label='Cancel' onTouchTap={() => this.handleCancel()}/>
         </div>
       );
     } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped) {

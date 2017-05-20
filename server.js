@@ -79,6 +79,14 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('client:cancelStart', (room) => {
+    if (clients[room].startPressed == 1) {
+      clients[room].startPressed = 0;
+    } else {
+      return;
+    }
+  });
+
   socket.on('client:playerIsReady', (room) => {
     if (clients[room].playersReady == 0) {
       clients[room].playersReady = 1;
