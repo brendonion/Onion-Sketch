@@ -16,6 +16,8 @@ class DrawArea extends React.Component {
     super();
     this.state = {
       isDrawing: false,
+      chosenShape: new Immutable.List(),
+      useShape: false,
       lines: new Immutable.List(),
       strokeColor: 'black',
       slider: 5,
@@ -57,7 +59,7 @@ class DrawArea extends React.Component {
   handleShapeFinish() {
     this.setState({prepped: true});
     console.log('shape done');
-    this.state.socket.emit('client:finishedShape', { value: this.state.lines });
+    this.state.socket.emit('client:finishedShape', { value: this.state.lines, room: this.state.room });
   }
 
   handleStart() {
@@ -172,11 +174,31 @@ class DrawArea extends React.Component {
 
     // Causing the setState(...) error
     this.state.socket.on('server:enoughPlayers', (data) => {
-      this.setState({enoughPlayers: true, room: data, roomJoined: true});
+      if (this.refs.waiting || this.refs.prep) {
+        this.setState({enoughPlayers: true, room: data, roomJoined: true});
+      }
     });
 
     this.state.socket.on('server:prepStart', () => {
-      this.setState({prepStart: true});
+      if (this.refs.prep || this.refs.waiting || this.refs.shape) {
+        this.setState({prepStart: true});
+      }
+    });
+
+    // also causes setState(...) error
+    this.state.socket.on('server:shapeChosen', (data) => {
+      setTimeout(() => {
+        if (this.refs.exists) {
+          this.setState(prevState => {
+              return {
+                chosenShape: Immutable.fromJS(data)
+              };
+            });
+          this.setState({
+            useShape: true
+          });
+        }
+      }, 3000);
     });
   }
   
@@ -199,11 +221,9 @@ class DrawArea extends React.Component {
       />
     ];
 
-    console.log('room', this.state.room);
-    console.log('roomJoined?', this.state.roomJoined);
     if (!this.state.start || !this.state.room || !this.state.roomJoined) {
       return (
-        <div className='drawing-container prep-container'>
+        <div className='drawing-container prep-container' ref='prep'>
           <span className='start-container'>
             <RaisedButton secondary={true} label='Create a Room' onTouchTap={(event) => this.handleOpen(event)} />
             <RaisedButton secondary={true} label='Join a Room' onTouchTap={(event) => this.handleRoomListOpen(event)} />
@@ -240,16 +260,16 @@ class DrawArea extends React.Component {
           </Popover>
         </div>
       );
-    } else if (this.state.start && this.state.room && this.state.roomJoined && (!this.state.enoughPlayers || !this.state.prepStart) && !this.state.prepped) {
+    } else if (this.state.start && this.state.room && this.state.roomJoined && (!this.state.enoughPlayers || !this.state.prepStart) && !this.state.prepped && !this.state.useShape) {
       return (
-        <div className='drawing-container prep-container'>
+        <div className='drawing-container prep-container' ref='waiting'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
           <RaisedButton label='Cancel' onTouchTap={() => this.handleCancel()}/>
         </div>
       );
-    } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped) {
+    } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped && !this.state.useShape) {
       return (
-          <div className='drawing-container prep-container'>
+          <div className='drawing-container prep-container' ref='shape'>
             <div>
               <h3>In Room: {this.state.room}</h3>
               <ShapeTimer handleShapeFinish={this.handleShapeFinish} />
@@ -260,10 +280,16 @@ class DrawArea extends React.Component {
             </div>
         </div>
       );
+    } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && this.state.prepped && !this.state.useShape) {
+      return (
+        <div className='drawing-container prep-container' ref='exists'>
+          <h1>Choosing Shape...</h1>
+        </div>
+      );
     } else {
       return (
         <DrawGame 
-          lines={this.state.lines} 
+          lines={this.state.chosenShape} 
           room={this.state.room} 
           roomJoined={this.state.roomJoined}
           socket={this.state.socket}
