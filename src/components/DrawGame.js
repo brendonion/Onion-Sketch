@@ -161,7 +161,7 @@ class DrawGame extends React.Component {
       );
     } else if (this.state.start && !this.state.gameReady) {
       return (
-        <div className='drawing-conainer'>
+        <div className='drawing-container'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
         </div>
       );
