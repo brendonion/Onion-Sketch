@@ -36,9 +36,9 @@ class Nav extends Component {
             <Link to='/register'><FlatButton label='Register'/></Link>
             <Redirect to='/' />
           </span>
-          } iconElementLeft={this.props.authed ? <span><Link to='/home'><i className="fa fa-pencil-square" aria-hidden="true"></i></Link></span> : 
-          <span><i className="fa fa-pencil-square" aria-hidden="true"></i></span>}
-          iconStyleRight={{margin: '10px'}} iconStyleLeft={{marginTop: '20px'}}>
+          } iconElementLeft={this.props.authed ? <span><Link to='/home'><img className='logo' src='./images/Onion-Logo.svg'/></Link></span> : 
+          <span><img className='logo' src='./images/Onion-Logo.svg'/></span>}
+          iconStyleRight={{margin: '10px'}} iconStyleLeft={{marginTop: '8px'}}>
       </AppBar>
     );
   }

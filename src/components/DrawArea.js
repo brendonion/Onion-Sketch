@@ -126,10 +126,6 @@ class DrawArea extends React.Component {
     });
   }
 
-  // TODO emit the room name and room join to the server 
-  // Only let the game begin once the room has 2 people
-
-  // issue with setState(...)
   makeRoom(event) {
     event.preventDefault();
     console.log('rooms', this.state.listOfRooms);
@@ -172,7 +168,6 @@ class DrawArea extends React.Component {
       }
     });
 
-    // Causing the setState(...) error
     this.state.socket.on('server:enoughPlayers', (data) => {
       if (this.refs.waiting || this.refs.prep) {
         this.setState({enoughPlayers: true, room: data, roomJoined: true});
@@ -185,7 +180,6 @@ class DrawArea extends React.Component {
       }
     });
 
-    // also causes setState(...) error
     this.state.socket.on('server:shapeChosen', (data) => {
       setTimeout(() => {
         if (this.refs.exists) {
@@ -265,6 +259,7 @@ class DrawArea extends React.Component {
         <div className='drawing-container prep-container' ref='waiting'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
           <RaisedButton label='Cancel' onTouchTap={() => this.handleCancel()}/>
+          <i className="fa fa-spinner" aria-hidden="true"></i>
         </div>
       );
     } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped && !this.state.useShape) {
