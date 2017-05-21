@@ -12,7 +12,10 @@ class Home extends Component {
   render () {
     return (
       <div className='home-page'>
-       <h1>Onion Sketch</h1>
+        <img className='home-logo' src='./images/Onion-Logo.svg'/>
+        <div className='home-header'>
+          <h1 className='welcome'>Welcome to Onion Sketch</h1>
+        </div>
       </div>
     )
   }

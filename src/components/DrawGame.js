@@ -49,10 +49,12 @@ class DrawGame extends React.Component {
   }
 
   handleStart() {
-    this.setState({
-      start: true
-    });
-    this.state.socket.emit('client:playerIsReady', this.state.room);
+    if (this.refs.start || this.refs.waitingForStart || this.refs.draw) {
+      this.setState({
+        start: true
+      });
+      this.state.socket.emit('client:playerIsReady', this.state.room);
+    }
   }
 
   handleEraser() {
@@ -112,7 +114,6 @@ class DrawGame extends React.Component {
     });
   }
 
-
   componentDidMount() {
     document.addEventListener('mouseup', this.handleMouseUp);
     this.setState({
@@ -126,17 +127,21 @@ class DrawGame extends React.Component {
   
   componentDidUpdate() {
     this.state.socket.on('server:playersReady', () => {
-      this.setState({
-        gameReady: true
-      });
+      if (this.refs.start || this.refs.waitingForStart || this.refs.draw) {
+        this.setState({
+          gameReady: true
+        });
+      }
     });
 
     this.state.socket.on('server:finalDrawings', (data) => {
-      this.setState({
-        drawings: true,
-        drawingOne: Immutable.fromJS(data.first),
-        drawingTwo: Immutable.fromJS(data.second)
-      });
+      if (this.refs.exists || this.refs.waiting) {
+        this.setState({
+          drawings: true,
+          drawingOne: Immutable.fromJS(data.first),
+          drawingTwo: Immutable.fromJS(data.second)
+        });
+      }
     });
   }
 
@@ -161,7 +166,7 @@ class DrawGame extends React.Component {
 
     if (!this.state.start && !this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
-        <div className='drawing-container'>
+        <div className='drawing-container' ref='start'>
           <div>
             <span className='start-container'>
               <RaisedButton secondary={true} label='START GAME' onTouchTap={this.handleStart} />
@@ -174,13 +179,13 @@ class DrawGame extends React.Component {
       );
     } else if (this.state.start && !this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
-        <div className='drawing-container'>
+        <div className='drawing-container' ref='waitingForStart'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
         </div>
       );
     } else if (this.state.start && this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
-        <div className='drawing-container'>
+        <div className='drawing-container' ref='draw'>
           <div>
             <GameTimer handleGameFinish={this.handleGameFinish} />
             <div className='drawArea' ref='drawArea' onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove}>
@@ -201,13 +206,14 @@ class DrawGame extends React.Component {
       );
     } else if (this.state.start && this.state.gameReady && this.state.finished && !this.state.drawings) {
       return (
-        <div className='drawing-container'>
+        <div className='drawing-container' ref='waiting'>
           <h1>Getting both players drawings...</h1>
         </div>
       );
     } else {
       return (
         <GameOver
+          ref='exists'
           drawingOne={this.state.drawingOne} 
           drawingTwo={this.state.drawingTwo} 
           lines={this.state.lines} 
