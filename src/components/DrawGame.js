@@ -26,6 +26,9 @@ class DrawGame extends React.Component {
       roomJoined: false,
       finished: false,
       concede: '',
+      drawings: false,
+      drawingOne: new Immutable.List(),
+      drawingTwo: new Immutable.List()
     };
 
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -40,7 +43,9 @@ class DrawGame extends React.Component {
   }
 
   handleGameFinish() {
+    console.log('game done');
     this.setState({finished: true});
+    this.state.socket.emit('client:drawingDone', {value: this.state.lines, room: this.state.room});
   }
 
   handleStart() {
@@ -125,6 +130,14 @@ class DrawGame extends React.Component {
         gameReady: true
       });
     });
+
+    this.state.socket.on('server:finalDrawings', (data) => {
+      this.setState({
+        drawings: true,
+        drawingOne: Immutable.fromJS(data.first),
+        drawingTwo: Immutable.fromJS(data.second)
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -146,7 +159,7 @@ class DrawGame extends React.Component {
       />,
     ];
 
-    if (!this.state.start) {
+    if (!this.state.start && !this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
         <div className='drawing-container'>
           <div>
@@ -159,13 +172,13 @@ class DrawGame extends React.Component {
           </div>
         </div>
       );
-    } else if (this.state.start && !this.state.gameReady) {
+    } else if (this.state.start && !this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
         <div className='drawing-container'>
           <h1 className='waiting-prompt'>Waiting for players...</h1>
         </div>
       );
-    } else if (this.state.start && this.state.gameReady && !this.state.finished) {
+    } else if (this.state.start && this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
         <div className='drawing-container'>
           <div>
@@ -186,9 +199,20 @@ class DrawGame extends React.Component {
           </div>
         </div>
       );
+    } else if (this.state.start && this.state.gameReady && this.state.finished && !this.state.drawings) {
+      return (
+        <div className='drawing-container'>
+          <h1>Getting both players drawings...</h1>
+        </div>
+      );
     } else {
       return (
-        <GameOver lines={this.state.lines} shape={this.state.shape} />
+        <GameOver
+          drawingOne={this.state.drawingOne} 
+          drawingTwo={this.state.drawingTwo} 
+          lines={this.state.lines} 
+          shape={this.state.shape} 
+        />
       );
     }
   }

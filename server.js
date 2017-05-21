@@ -17,6 +17,7 @@ const io = socketio(server);
 
 let clients = {};
 let shapes = {};
+let drawings = {};
 
 function chooseOne() {
   return Math.floor(Math.random() * 2) + 1;
@@ -117,6 +118,17 @@ io.on('connection', (socket) => {
     } else if (clients[room].playersReady == 1) {
       clients[room].playersReady = 2;
       io.sockets.in(room).emit('server:playersReady');
+    } else {
+      return;
+    }
+  });
+
+  socket.on('client:drawingDone', (data) => {
+    if (drawings[data.room] == undefined) {
+      drawings[data.room] = {first: data.value, second: null};
+    } else if (drawings[data.room].first) {
+      drawings[data.room].second = data.value;
+      io.sockets.in(data.room).emit('server:finalDrawings', drawings[data.room]);
     } else {
       return;
     }
