@@ -53,7 +53,7 @@ const config = {
     {
       test: /\.css$/,
       include: /node_modules/,
-      loader: 'style!css?sourceMap'
+      loader: 'style-loader!css-loader?sourceMap'
     },
     {
       test: /\.scss$/,
@@ -62,7 +62,7 @@ const config = {
     {
       test: /\.css$/,
       exclude: /node_modules/,
-      loader: 'style!css?modules&localIdentName=[name]---[local]---[hash:base64:5]',
+      loader: 'style-loader!css-loader?modules&localIdentName=[name]---[local]---[hash:base64:5]',
     },
     {
       test: /\.(jpe?g|png|gif|svg)$/i,

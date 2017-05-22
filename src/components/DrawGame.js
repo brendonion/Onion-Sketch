@@ -4,6 +4,7 @@ import Immutable from 'immutable';
 
 import {RaisedButton, FlatButton, Dialog} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
+import Spinner from 'react-spinkit';
 
 import GameTimer from './GameTimer';
 import GameOver from './GameOver';
@@ -135,13 +136,15 @@ class DrawGame extends React.Component {
     });
 
     this.state.socket.on('server:finalDrawings', (data) => {
-      if (this.refs.exists || this.refs.waiting) {
-        this.setState({
-          drawings: true,
-          drawingOne: Immutable.fromJS(data.first),
-          drawingTwo: Immutable.fromJS(data.second)
-        });
-      }
+      setTimeout(() => {
+        if (this.refs.exists || this.refs.waiting) {
+          this.setState({
+            drawings: true,
+            drawingOne: Immutable.fromJS(data.first),
+            drawingTwo: Immutable.fromJS(data.second)
+          });
+        }
+      }, 3000);
     });
   }
 
@@ -180,7 +183,10 @@ class DrawGame extends React.Component {
     } else if (this.state.start && !this.state.gameReady && !this.state.finished && !this.state.drawings) {
       return (
         <div className='drawing-container' ref='waitingForStart'>
-          <h1 className='waiting-prompt'>Waiting for players...</h1>
+          <span className='waiting-prompt'>
+            <h1>Waiting for players...</h1>
+            <Spinner className='spinner' name='cube-grid' />
+          </span>
         </div>
       );
     } else if (this.state.start && this.state.gameReady && !this.state.finished && !this.state.drawings) {
@@ -207,7 +213,10 @@ class DrawGame extends React.Component {
     } else if (this.state.start && this.state.gameReady && this.state.finished && !this.state.drawings) {
       return (
         <div className='drawing-container' ref='waiting'>
-          <h1>Getting both players drawings...</h1>
+          <span className='waiting-prompt'>
+            <h1>Getting both players drawings...</h1>
+            <Spinner className='spinner' name='cube-grid' />
+          </span>
         </div>
       );
     } else {
