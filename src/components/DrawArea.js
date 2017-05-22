@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import { SketchPicker } from 'react-color';
 import { Redirect } from 'react-router-dom';
 import io from 'socket.io-client';
+import Spinner from 'react-spinkit';
 
 import {RaisedButton, FlatButton, Menu, MenuItem, Dialog, TextField, DropDownMenu} from 'material-ui';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
@@ -204,12 +205,12 @@ class DrawArea extends React.Component {
 
     const actions = [
       <FlatButton
-        label="Cancel"
+        label='Cancel'
         primary={true}
         onTouchTap={(event) => this.handleClose(event)}
       />,
       <FlatButton
-        label="Submit"
+        label='Submit'
         primary={true}
         onTouchTap={(event) => this.makeRoom(event)}
       />
@@ -257,9 +258,11 @@ class DrawArea extends React.Component {
     } else if (this.state.start && this.state.room && this.state.roomJoined && (!this.state.enoughPlayers || !this.state.prepStart) && !this.state.prepped && !this.state.useShape) {
       return (
         <div className='drawing-container prep-container' ref='waiting'>
-          <h1 className='waiting-prompt'>Waiting for players...</h1>
-          <RaisedButton label='Cancel' onTouchTap={() => this.handleCancel()}/>
-          <i className="fa fa-spinner" aria-hidden="true"></i>
+          <span className='waiting-prompt'>
+            <h1>Waiting for players...</h1>
+            <Spinner className='spinner' name='cube-grid' />
+            <RaisedButton style={{width: '88px', display: 'flex', margin: 'auto'}} label='Cancel' onTouchTap={() => this.handleCancel()}/>
+          </span>
         </div>
       );
     } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && !this.state.prepped && !this.state.useShape) {
@@ -278,7 +281,10 @@ class DrawArea extends React.Component {
     } else if (this.state.start && this.state.room && this.state.roomJoined && this.state.enoughPlayers && this.state.prepStart && this.state.prepped && !this.state.useShape) {
       return (
         <div className='drawing-container prep-container' ref='exists'>
-          <h1>Choosing Shape...</h1>
+          <span className='waiting-prompt'>
+            <h1>Choosing shape...</h1>
+            <Spinner className='spinner' name='cube-grid' />
+          </span>
         </div>
       );
     } else {

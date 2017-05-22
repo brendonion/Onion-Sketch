@@ -125,10 +125,11 @@ $dark-paper: #94c2d1;
   z-index: 10;
 }
 
-.fa-spinner {
-  animation: spin 0.7s infinite linear;
-  @keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
-  }
+.waiting-prompt {
+  text-align: center;
+}
+
+.spinner {
+  margin: auto;
+  margin-bottom: 20px;
 }
