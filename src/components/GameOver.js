@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { RaisedButton } from 'material-ui';
 import Immutable from 'immutable';
 
@@ -15,6 +14,11 @@ class GameOver extends React.Component {
     };
   }
 
+  // TODO reset game and all the data
+  gameReset() {
+    this.props.history.push('/home');
+  }
+
   componentDidMount() {
     this.setState({
       lines: this.props.lines, 
@@ -24,13 +28,7 @@ class GameOver extends React.Component {
     });
   }
 
-  // TODO reset game and all the data
-  gameReset() {
-    console.log('reset!');
-  }
-
-  render() {
-    
+  render() { 
     return (
       <div className='drawing-container'>
         <h3 className='prompt'>Before...</h3>
@@ -47,11 +45,11 @@ class GameOver extends React.Component {
           </div>
         </span>
         <span className='button-container'>
-          <Link to='/home'>
-            <RaisedButton className='draw-options' primary={true} onTouchTap={this.gameReset}>
+          <span>
+            <RaisedButton className='draw-options' primary={true} onTouchTap={this.gameReset.bind(this)}>
               <i className="fa fa-home" aria-hidden="true"></i>
             </RaisedButton>
-          </Link>
+          </span>
         </span>
       </div>
     );

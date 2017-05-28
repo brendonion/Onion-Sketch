@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import firebase from 'firebase';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -32,6 +33,14 @@ class Login extends Component {
     resetPassword(this.email.getValue())
       .then(() => this.setState(setErrorMsg(`Password reset email sent to ${this.email.value}.`)))
       .catch((error) => this.setState(setErrorMsg(`Email address not found.`)));
+  }
+
+  componentWillMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.props.history.push('/home');
+      } 
+    });
   }
 
   render() {

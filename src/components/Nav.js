@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Route, Link, Redirect } from 'react-router-dom';
 
 import { logout } from '../helpers/auth.js';
-import { firebaseAuth } from '../services/Firebase';
+import firebase from 'firebase';
 
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -12,31 +11,77 @@ import IconMenu from 'material-ui/IconMenu';
 
 
 class Nav extends Component {
+  constructor() {
+    super();
+    this.state = {
+      authed: false,
+      user: null
+    };
+  }
+
+  home() {
+    this.props.history.push('/home');
+  }
+
+  drawGame() {
+    this.props.history.push('/canvas');
+  }
+
+  casual() {
+    this.props.history.push('/casual')
+  }
+
+  login() {
+    this.props.history.push('/login');
+  }
+
+  register() {
+    this.props.history.push('/register')
+  }
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      console.log(user);
+      if (user) {
+        this.setState({
+          authed: true,
+          user: user,
+        })
+      } else {
+        this.setState({
+          authed: false,
+          user: null
+        })
+        this.props.history.push('/');
+      }
+    });
+  }
 
   render () {
     return (
-      <AppBar style={{background: '#d30236'}} title='Onion Sketch' iconElementRight={this.props.authed
+      <AppBar style={{background: '#d30236'}} title='Onion Sketch' iconElementRight={this.state.authed
+        ? 
+        <span>
+          <span className='user-email'>{this.state.user.email}</span>
+          <span className='home-button'><RaisedButton onTouchTap={this.home.bind(this)}><i className="fa fa-home" aria-hidden="true"></i></RaisedButton></span>
+          <span className='casual-button'><RaisedButton onTouchTap={this.casual.bind(this)}><i className="fa fa-coffee" aria-hidden="true"></i></RaisedButton></span>
+          <span className='canvas-button'><RaisedButton onTouchTap={this.drawGame.bind(this)}><i className="fa fa-pencil-square-o" aria-hidden="true"></i></RaisedButton></span>
+          <FlatButton
+            className='logout-button'
+            label='Logout'
+            primary={false}
+            onTouchTap={() => { logout(); }}
+          />
+        </span>
+        : 
+        <span>
+          <span><FlatButton label='Login' onTouchTap={this.login.bind(this)}/></span>
+          <span><FlatButton label='Register' onTouchTap={this.register.bind(this)}/></span>
+        </span>
+        } iconElementLeft={this.state.authed 
           ? 
-          <span>
-            <span className='user-email'>{this.props.user.email}</span>
-            <Link to='/home' className='home-button'><RaisedButton><i className="fa fa-home" aria-hidden="true"></i></RaisedButton></Link>
-            <Link to='/casual' className='casual-button'><RaisedButton><i className="fa fa-coffee" aria-hidden="true"></i></RaisedButton></Link>
-            <Link to='/canvas' className='canvas-button'><RaisedButton><i className="fa fa-pencil-square-o" aria-hidden="true"></i></RaisedButton></Link>
-            <FlatButton
-              className='logout-button'
-              label='Logout'
-              primary={false}
-              onTouchTap={() => { logout(); }}
-            />
-            <Redirect to='/home' />
-          </span>
+          <span><img className='logo' src='./images/Onion-Logo.svg'/></span> 
           : 
-          <span>
-            <Link to='/login'><FlatButton label='Login'/></Link>
-            <Link to='/register'><FlatButton label='Register'/></Link>
-            <Redirect to='/' />
-          </span>
-          } iconElementLeft={this.props.authed ? <span><Link to='/home'><img className='logo' src='./images/Onion-Logo.svg'/></Link></span> : 
           <span><img className='logo' src='./images/Onion-Logo.svg'/></span>}
           iconStyleRight={{margin: '10px'}} iconStyleLeft={{marginTop: '8px'}}>
       </AppBar>

@@ -8,6 +8,7 @@ import Spinner from 'react-spinkit';
 
 import GameTimer from './GameTimer';
 import GameOver from './GameOver';
+import { firebaseAuth } from '../services/Firebase';
 
 
 class DrawGame extends React.Component {
@@ -226,7 +227,8 @@ class DrawGame extends React.Component {
           drawingOne={this.state.drawingOne} 
           drawingTwo={this.state.drawingTwo} 
           lines={this.state.lines} 
-          shape={this.state.shape} 
+          shape={this.state.shape}
+          history={this.props.history} 
         />
       );
     }

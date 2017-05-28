@@ -83,6 +83,7 @@ const config = {
   devServer: {
     historyApiFallback: true,
  },
+  devtool: 'source-map',
   // We have to manually add the Hot Replacement plugin when running
   // from Node
   plugins: [new Webpack.HotModuleReplacementPlugin()]

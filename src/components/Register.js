@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import firebase from 'firebase';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -12,7 +13,6 @@ function setErrorMsg(error) {
 }
 
 class Register extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -24,6 +24,14 @@ class Register extends Component {
     event.preventDefault();
     auth(this.email.getValue(), this.pass.getValue())
       .catch(event => this.setState(setErrorMsg(event)));
+  }
+
+  componentWillMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.props.history.push('/home');
+      } 
+    });
   }
 
   render() {

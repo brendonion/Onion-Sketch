@@ -294,6 +294,7 @@ class DrawArea extends React.Component {
           room={this.state.room} 
           roomJoined={this.state.roomJoined}
           socket={this.state.socket}
+          history={this.props.history}
         />
       );
     }

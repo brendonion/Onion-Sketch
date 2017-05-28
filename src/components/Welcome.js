@@ -1,8 +1,21 @@
 import React, { Component } from 'react'
+import firebase from 'firebase';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Link } from 'react-router-dom';
 
 class Welcome extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentWillMount() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.props.history.push('/home');
+      } 
+    });
+  }
+
   render () {
     return (
       <div className='welcome-page'>

@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { Route, BrowserRouter, Link, Redirect, Switch } from 'react-router-dom';
+import { connect } from 'react-redux';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import io from 'socket.io-client';
 
+import { Route, withRouter } from 'react-router'
+import { routerReducer, push, routerMiddleware, ConnectedRouter } from 'react-router-redux';
+
 import './styles/App.scss';
 
+import { logout } from './helpers/auth.js';
+import { firebaseAuth } from './services/Firebase';
 import Nav from './components/Nav';
 import Welcome from './components/Welcome';
 import Login from './components/Login';
@@ -15,54 +20,20 @@ import DrawArea from './components/DrawArea';
 import DrawGame from './components/DrawGame';
 import GameOver from './components/GameOver';
 import CasualDraw from './components/CasualDraw';
-import { logout } from './helpers/auth.js';
-import { firebaseAuth } from './services/Firebase';
 
 
 injectTapEventPlugin();
 
-let socket;
-
 class App extends Component {
-  
   constructor(props) {
     super(props);
     this.state = {
-      authed: false,
       loading: true,
-      user: null,
       listOfRooms: [],
       room: '',
       roomJoined: false,
       socket: io.connect('http://localhost:3000')
     }
-  }
-
-  componentDidMount() {
-    this.removeListener = firebaseAuth().onAuthStateChanged((user) => {
-      if (user) {
-        this.setState({
-          authed: true,
-          loading: false,
-          user: user,
-        })
-      } else {
-        this.setState({
-          authed: false,
-          loading: false,
-          user: null
-        })
-      }
-    });
-
-    this.state.socket.on('server:roomCreated', (data) => {
-      this.state.listOfRooms.push(data);
-      this.setState({listOfRooms: this.state.listOfRooms });
-    });
-
-    this.state.socket.on('server:roomJoined', (data) => {
-      this.setState({room: data, roomJoined: true});
-    });
   }
 
   theDrawArea() {
@@ -72,40 +43,47 @@ class App extends Component {
         listOfRooms={this.state.listOfRooms} 
         room={this.state.room}  
         roomJoined={this.state.roomJoined} 
+        history={this.props.history}
       />
     );
   }
 
-  componentWillUnmount() {
-    this.removeListener();
+  componentDidMount() {
+    this.setState({
+      loading: false
+    })
   }
 
   render() {
     return this.state.loading === true ? <h1>Loading</h1> : (
       <MuiThemeProvider>
-        <BrowserRouter>
-          <div>
-            <Nav authed={this.state.authed} user={this.state.user} />
-            <div className='container'>
-              <div className='row'>
-                <Switch>
-                  <Route path='/' exact component={Welcome} />
-                  <Route authed={this.state.authed} path='/login' component={Login} />
-                  <Route authed={this.state.authed} path='/register' component={Register} />
-                  <Route authed={this.state.authed} path='/home' component={Home} />
-                  <Route authed={this.state.authed} path='/canvas' component={this.theDrawArea.bind(this)} />
-                  <Route authed={this.state.authed} path='/game' component={DrawGame} />
-                  <Route authed={this.state.authed} path='/gameover' component={GameOver} />
-                  <Route authed={this.state.authed} path='/casual' component={CasualDraw} />
-                  <Route render={() => <h3>No Match</h3>} />
-                </Switch>
-              </div>
+        <div className='container'>
+          <div className='row'>
+            <Nav history={this.props.history} />
+              <ConnectedRouter history={this.props.history}>
+                <div>
+                  <Route path='/' exact component={withRouter(Welcome)} />
+                  <Route path='/login' component={withRouter(Login)} />
+                  <Route path='/register' component={withRouter(Register)} />
+                  <Route path='/home' component={withRouter(Home)} />
+                  <Route path='/canvas' component={withRouter(this.theDrawArea.bind(this))} />
+                  <Route path='/game' component={withRouter(DrawGame)} />
+                  <Route path='/gameover' component={withRouter(GameOver)} />
+                  <Route path='/casual' component={withRouter(CasualDraw)} />
+                </div>
+              </ConnectedRouter>
             </div>
           </div>
-        </BrowserRouter>
       </MuiThemeProvider>
     );
   }
 }
 
-export default App;
+export default connect (
+  state => ({
+    router: state.router,
+    success: !state.rootReducer.authenticate.didFail,
+    loading: state.rootReducer.authenticate.isFetching,
+  }),
+  dispatch => ({})
+)(App)
